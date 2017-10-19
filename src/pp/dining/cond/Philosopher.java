@@ -5,7 +5,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Philosopher extends Thread implements IPhilosopher{
+public class Philosopher extends Thread {
 	Lock tablex = new ReentrantLock() ;
 	Condition isst = this.tablex.newCondition();
 	Condition denkt = this.tablex.newCondition();
@@ -58,7 +58,7 @@ public class Philosopher extends Thread implements IPhilosopher{
 			 */
 			tablex.lock();
 				try {
-					while(left.isAlive() == true){
+					while(left.isAlive() == false){
 						isst.await();
 					}
 				} catch (InterruptedException e) {
@@ -81,7 +81,7 @@ public class Philosopher extends Thread implements IPhilosopher{
 				 */
 				tablex.lock();
 				try{
-					while(right.isAlive()==true){
+					while(right.isAlive()==false){
 						isst.await();
 					}
 				} catch (InterruptedException e) {
@@ -111,16 +111,17 @@ public class Philosopher extends Thread implements IPhilosopher{
 			}
 			
 		}
+		isst.signalAll();
 		System.out.println(Thread.currentThread().getId() + " stopped; eaten=" + this.eaten);
 	
 	}
 
-	public void setLeft(IPhilosopher left) {
-		this.left = (Philosopher) left;
+	public void setLeft(Philosopher left) {
+		this.left = left;
 	}
 
-	public void setRight(IPhilosopher right) {
-		this.right = (Philosopher) right;
+	public void setRight(Philosopher right) {
+		this.right =  right;
 	}
 	public void setTable(Lock table){
 		this.tablex = table;

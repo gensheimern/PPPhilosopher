@@ -8,7 +8,7 @@ public class PhilosopherExperiment {
 	static final int MAX_TAKING_TIME_MS = 100;
 	static final int PHILOSOPHER_NUM = 5;
 	static final int EXP_DURATION_MS = 20000;
-	static IPhilosopher[] philosophers = new Philosopher[PhilosopherExperiment.PHILOSOPHER_NUM];
+	static Philosopher[] philosophers = new Philosopher[PhilosopherExperiment.PHILOSOPHER_NUM];
 
 	public static void main(final String[] args) throws InterruptedException {
 		final Lock table = new ReentrantLock();
