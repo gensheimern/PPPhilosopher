@@ -5,14 +5,15 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Philosopher extends Thread{
-	Lock table = new ReentrantLock();
-	Condition isst = table.newCondition();
-	Condition denkt = table.newCondition();
+public class Philosopher extends Thread implements IPhilosopher{
+	Lock tablex = new ReentrantLock() ;
+	Condition isst = this.tablex.newCondition();
+	Condition denkt = this.tablex.newCondition();
 	private Philosopher left;
 	private Philosopher right;
 	private final Random random;
 	private int eaten;
+	
 	
 
 	private volatile boolean stop;
@@ -24,10 +25,11 @@ public class Philosopher extends Thread{
 		this.interrupt();
 	}
 
-	public Philosopher(Lock table) {
+	public Philosopher() {
 		this.stop = false;
 		this.random = new Random();
 		this.eaten = 0;
+		
 	}
 
 
@@ -54,16 +56,16 @@ public class Philosopher extends Thread{
 			 * Hier wird überprüft ob der link Sitznachbar isst.
 			 * Falls ja ->> Soll das Aktuelle Objekt "warten".
 			 */
-			table.lock();
+			tablex.lock();
 				try {
-					while(left.stop= false){
+					while(left.isAlive() == true){
 						isst.await();
 					}
 				} catch (InterruptedException e) {
 					System.out.println("Exception1");
 					e.printStackTrace();
 				}finally{
-					table.unlock();
+					tablex.unlock();
 				}
 				System.out.println(Thread.currentThread().getId() + " left acquired");
 				try {
@@ -77,20 +79,21 @@ public class Philosopher extends Thread{
 				 * Hier wird überprüft ob der rechte Sitznachbar isst.
 				 * Falls ja ->> Soll das Aktuelle Objekt "warten".
 				 */
-				table.lock();
+				tablex.lock();
 				try{
-					while(right.stop=false){
+					while(right.isAlive()==true){
 						isst.await();
 					}
 				} catch (InterruptedException e) {
 					System.out.println("Exception2");
 					e.printStackTrace();
 				}finally{
-					table.unlock();
+					tablex.unlock();
 				}
 //				synchronized (this.right) {
 					System.out.println(Thread.currentThread().getId() + " right acquired");
 					System.out.println(Thread.currentThread().getId() + " eating");
+				
 					this.eaten++;
 //				}
 				System.out.println(Thread.currentThread().getId() + " right released");
@@ -109,18 +112,21 @@ public class Philosopher extends Thread{
 			
 		}
 		System.out.println(Thread.currentThread().getId() + " stopped; eaten=" + this.eaten);
+	
 	}
 
-	public void setLeft(Philosopher philosopher) {
-		this.left = philosopher;
+	public void setLeft(IPhilosopher left) {
+		this.left = (Philosopher) left;
 	}
 
-	public void setRight(Philosopher philosopher) {
-		this.right = philosopher;
+	public void setRight(IPhilosopher right) {
+		this.right = (Philosopher) right;
 	}
 	public void setTable(Lock table){
-		this.table = table;
+		this.tablex = table;
 	}
+
+
 
 	
 }
