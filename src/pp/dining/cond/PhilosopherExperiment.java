@@ -11,26 +11,34 @@ public class PhilosopherExperiment {
 	static Philosopher[] philosophers = new Philosopher[PhilosopherExperiment.PHILOSOPHER_NUM];
 
 	public static void main(final String[] args) throws InterruptedException {
+		
 		final Lock table = new ReentrantLock();
+		
 		for (int i = 0; i < PhilosopherExperiment.PHILOSOPHER_NUM; i++) {
 			PhilosopherExperiment.philosophers[i] = new Philosopher();
 			PhilosopherExperiment.philosophers[i].setTable(table);
 		}
+		
 		PhilosopherExperiment.philosophers[0]
 				.setLeft(PhilosopherExperiment.philosophers[PhilosopherExperiment.PHILOSOPHER_NUM - 1]);
 		PhilosopherExperiment.philosophers[0].setRight(PhilosopherExperiment.philosophers[1]);
+		
 		for (int i = 1; i < (PhilosopherExperiment.PHILOSOPHER_NUM - 1); i++) {
 			PhilosopherExperiment.philosophers[i].setLeft(PhilosopherExperiment.philosophers[i - 1]);
 			PhilosopherExperiment.philosophers[i].setRight(PhilosopherExperiment.philosophers[i + 1]);
 		}
+		
 		PhilosopherExperiment.philosophers[PhilosopherExperiment.PHILOSOPHER_NUM - 1]
 				.setLeft(PhilosopherExperiment.philosophers[PhilosopherExperiment.PHILOSOPHER_NUM - 2]);
 		PhilosopherExperiment.philosophers[PhilosopherExperiment.PHILOSOPHER_NUM - 1]
 				.setRight(PhilosopherExperiment.philosophers[0]);
+		
 		for (int i = 0; i < PhilosopherExperiment.PHILOSOPHER_NUM; i++) {
 			PhilosopherExperiment.philosophers[i].start();
 		}
+		
 		Thread.sleep(PhilosopherExperiment.EXP_DURATION_MS);
+		
 		for (int i = 0; i < PhilosopherExperiment.PHILOSOPHER_NUM; i++) {
 			PhilosopherExperiment.philosophers[i].stopPhilosopher();
 		}
