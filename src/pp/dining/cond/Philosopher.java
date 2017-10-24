@@ -37,7 +37,7 @@ public class Philosopher extends Thread {
 	@Override
 	public void run() {
 
-		System.out.println(Thread.currentThread().getId() - 10 + " starting");
+		System.out.println(Thread.currentThread().getId() - 10 + " : IS STARTING");
 
 		while (!this.stop) {
 
@@ -71,7 +71,7 @@ public class Philosopher extends Thread {
 			 */
 			try {
 
-				System.out.println(Thread.currentThread().getId() - 10 + " : TRY TO TAKE THE LEFT SPACE");
+				System.out.println(Thread.currentThread().getId() - 10 + " : TRY TO TAKE THE LEFT CHOPSTICK");
 
 				while (this.left.isstBoolean) {
 					System.out.println(Thread.currentThread().getId() - 10 + " : IS EATING");
@@ -93,7 +93,7 @@ public class Philosopher extends Thread {
 
 			}
 
-			System.out.println(Thread.currentThread().getId() - 10 + " : AQUIRED THE FREE LEFT SPACE");
+			System.out.println(Thread.currentThread().getId() - 10 + " : AQUIRED THE FREE LEFT CHOPSTICK");
 			try {
 
 				System.out.println(Thread.currentThread().getId() - 10 + " : MAX_TAKING_TIME_MS");
@@ -113,7 +113,7 @@ public class Philosopher extends Thread {
 			 */
 			try {
 
-				System.out.println(Thread.currentThread().getId() - 10 + " : TRY TO TAKE THE RIGHT SPACE");
+				System.out.println(Thread.currentThread().getId() - 10 + " : TRY TO TAKE THE RIGHT CHOPSTICK");
 				while (this.right.isstBoolean) {
 
 					System.out.println(Thread.currentThread().getId() - 10 + " : IS EATING");
@@ -132,7 +132,7 @@ public class Philosopher extends Thread {
 				this.isstBoolean = false;
 				tablex.unlock();
 			}
-			System.out.println(Thread.currentThread().getId() - 10 + " : AQUIRED THE FREE RIGHT SPACE");
+			System.out.println(Thread.currentThread().getId() - 10 + " : AQUIRED THE FREE RIGHT CHOPSTICK");
 
 			// is releasing the right Thread an after that, the left Thread
 			System.out.println(Thread.currentThread().getId() - 10 + " : RIGHT THREAD IS RELEASED");
