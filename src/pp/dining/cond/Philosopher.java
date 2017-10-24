@@ -84,7 +84,7 @@ public class Philosopher extends Thread {
 //				changed HERE
 				while(this.left.isstBoolean){
 					System.out.println(Thread.currentThread().getId()-10+" ....getting isst.await -> sleep");
-					this.isstBoolean = true;
+					this.isstBoolean = false;
 					this.denktBoolean = false;
 					isst.await();
 				}
@@ -122,10 +122,17 @@ public class Philosopher extends Thread {
 			try{
 				while(this.right.isstBoolean){
 					System.out.println(Thread.currentThread().getId()-10+" .... going essen await 2 in right.Alive");
-					this.isstBoolean = true;
+					this.isstBoolean = false;
 					this.denktBoolean = false;
 					isst.await();
 				}
+				
+				System.out.println(Thread.currentThread().getId()-10 + " right acquired");
+				System.out.println(Thread.currentThread().getId()-10 + " eating");
+				this.isstBoolean = true;
+
+				this.eaten++;
+				
 			} catch (InterruptedException e) {
 				System.out.println("Exception2");
 				e.printStackTrace();
@@ -135,10 +142,7 @@ public class Philosopher extends Thread {
 				tablex.unlock();
 			}
 			//				synchronized (this.right) {
-			System.out.println(Thread.currentThread().getId()-10 + " right acquired");
-			System.out.println(Thread.currentThread().getId()-10 + " eating");
-
-			this.eaten++;
+			
 			//				}
 			System.out.println(Thread.currentThread().getId()-10 + " right released");
 			try {
@@ -156,6 +160,7 @@ public class Philosopher extends Thread {
 				Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_TAKING_TIME_MS));
 			} catch (final InterruptedException e) {
 				System.out.println("Exception");
+				e.printStackTrace();
 			}
 
 		}
