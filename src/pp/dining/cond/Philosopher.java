@@ -7,26 +7,23 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Philosopher extends Thread {
 
-	Lock tablex = new ReentrantLock() ;
+	Lock tablex = new ReentrantLock();
 
 	Condition isst = this.tablex.newCondition();
 	boolean isstBoolean;
-	
+
 	Condition denkt = this.tablex.newCondition();
 	boolean denktBoolean;
-	
+
 	private Philosopher left;
 	private Philosopher right;
 	private final Random random;
 	private int eaten;
 
-
-
 	private volatile boolean stop;
 
-
 	public void stopPhilosopher() {
-		System.out.println(this.getId()-10 + " stopping");
+		System.out.println(this.getId() - 10 + " stopping");
 		this.stop = true;
 		this.interrupt();
 	}
@@ -37,154 +34,138 @@ public class Philosopher extends Thread {
 		this.eaten = 0;
 	}
 
-
-
 	@Override
 	public void run() {
 
-		System.out.println(Thread.currentThread().getId()-10 + " starting");
+		System.out.println(Thread.currentThread().getId() - 10 + " starting");
 
 		while (!this.stop) {
-		
-//			Think Abschnitt
+
 			try {
 				this.denktBoolean = true;
 				Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_THINKING_DURATION_MS));
-				System.out.println(Thread.currentThread().getId()-10+" ....MAX_Think");
+				System.out.println(Thread.currentThread().getId() - 10 + " : MAX_THINKIND_DURATION");
 			} catch (final InterruptedException e) {
 				// empty
-			}finally{
+			} finally {
 				this.denktBoolean = false;
 			}
 
 			try {
 				Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_TAKING_TIME_MS));
-				System.out.println(Thread.currentThread().getId()-10+" ....MAX_Take");
+				System.out.println(Thread.currentThread().getId() - 10 + " : MAX_TAKING_TIME_MS");
 			} catch (final InterruptedException e) {
-				// empty
+				e.printStackTrace();
 			}
 
-			System.out.println(Thread.currentThread().getId()-10 + " try taking left");
-//			Ende von think
-			
-			
-			//			synchronized (this.table) {
-			/*
-			 * Eintritt in den Kritischen Abschnitt.
-			 * Hier wird überprüft ob der link Sitznachbar isst.
-			 * Falls ja ->> Soll das Aktuelle Objekt "warten".
-			 */
-			System.out.println(Thread.currentThread().getId()-10+" ....getting lock 1");
-			
-			
+			// Thread is locking the table to eat. The Thread has to check if
+			// the left or right space is available and no other Thread
+			// is eating already
+			System.out.println(Thread.currentThread().getId() - 10 + " : GETTING LOCK, PREPARES TO EAT");
 			tablex.lock();
-			
-			
+
+			/*
+			 * Entry into the critical section. Here is checked if the right
+			 * seat neighbor eats. In case of yes -> the actually running Thread
+			 * has to wait
+			 */
 			try {
-//				changed HERE
-				while(this.left.isstBoolean){
-					System.out.println(Thread.currentThread().getId()-10+" ....getting isst.await -> sleep");
+
+				System.out.println(Thread.currentThread().getId() - 10 + " : TRY TO TAKE THE LEFT SPACE");
+
+				while (this.left.isstBoolean) {
+					System.out.println(Thread.currentThread().getId() - 10 + " : IS EATING");
 					this.isstBoolean = false;
 					this.denktBoolean = false;
 					isst.await();
 				}
 			} catch (InterruptedException e) {
-				System.out.println("Exception1");
 				e.printStackTrace();
-			}finally{
-				System.out.println(Thread.currentThread().getId()-10+" ....  giving lock back -> finally-Block");
+			} finally {
+				System.out.println(Thread.currentThread().getId() - 10 + " : PUTS THE LOCK BACK FOR NEXT FREE THREAD");
 				this.isstBoolean = false;
+
+				// to unlock the table. Must be in the finally Block to get
+				// sure, that in both cases of the try-catch Block, the table
+				// lock
+				// are getting unlock for usage of the next free Thread.
 				tablex.unlock();
+
 			}
 
-
-			System.out.println(Thread.currentThread().getId()-10 + " left acquired");
-
-			//				try2
+			System.out.println(Thread.currentThread().getId() - 10 + " : AQUIRED THE FREE LEFT SPACE");
 			try {
-				System.out.println(Thread.currentThread().getId()-10+" ....  taking time in try 2");
+
+				System.out.println(Thread.currentThread().getId() - 10 + " : MAX_TAKING_TIME_MS");
 				Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_TAKING_TIME_MS));
+
 			} catch (final InterruptedException e) {
-				// empty
+				e.printStackTrace();
 			}
 
-			System.out.println(Thread.currentThread().getId()-10+ " try taking right");
-			/*
-			 * Eintritt in den Kritischen Abschnitt.
-			 * Hier wird überprüft ob der rechte Sitznachbar isst.
-			 * Falls ja ->> Soll das Aktuelle Objekt "warten".
-			 */
-			System.out.println(Thread.currentThread().getId()-10+" ....  getting lock 2");
-			
-			
+			//
+			System.out.println(Thread.currentThread().getId() - 10 + " : GETTING LOCK, PREPARES TO EAT");
 			tablex.lock();
-		
-			try{
-				while(this.right.isstBoolean){
-					System.out.println(Thread.currentThread().getId()-10+" .... going essen await 2 in right.Alive");
+
+			/*
+			 * Entry into the critical section. Here is checked if the right
+			 * seat neighbor eats. In case of yes -> the actually running Thread
+			 * has to wait
+			 */
+			try {
+
+				System.out.println(Thread.currentThread().getId() - 10 + " : TRY TO TAKE THE RIGHT SPACE");
+				while (this.right.isstBoolean) {
+
+					System.out.println(Thread.currentThread().getId() - 10 + " : IS EATING");
 					this.isstBoolean = false;
 					this.denktBoolean = false;
 					isst.await();
+
 				}
-				
-				System.out.println(Thread.currentThread().getId()-10 + " right acquired");
-				System.out.println(Thread.currentThread().getId()-10 + " eating");
 				this.isstBoolean = true;
-
 				this.eaten++;
-				
+
 			} catch (InterruptedException e) {
-				System.out.println("Exception2");
 				e.printStackTrace();
-			}finally{
-				System.out.println(Thread.currentThread().getId()-10+" .... giving lock 2 back in finally");
+			} finally {
+				System.out.println(Thread.currentThread().getId() - 10 + " : PUTS THE LOCK BACK FOR NEXT FREE THREAD");
 				this.isstBoolean = false;
 				tablex.unlock();
 			}
-			//				synchronized (this.right) {
-			
-			//				}
-			System.out.println(Thread.currentThread().getId()-10 + " right released");
+			System.out.println(Thread.currentThread().getId() - 10 + " : AQUIRED THE FREE RIGHT SPACE");
+
+			// is releasing the right Thread an after that, the left Thread
+			System.out.println(Thread.currentThread().getId() - 10 + " : RIGHT THREAD IS RELEASED");
 			try {
-				//					max_taking 2
-				System.out.println(Thread.currentThread().getId()-10+" .... sleeping bei max_taking 2");
+
+				System.out.println(Thread.currentThread().getId() - 10 + " : MAX_TAKING_TIME_MS");
 				Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_TAKING_TIME_MS));
 			} catch (final InterruptedException e) {
-				// empty
+				e.printStackTrace();
 			}
-			//			}
-			System.out.println(Thread.currentThread().getId()-10 + " left released");
+
+			System.out.println(Thread.currentThread().getId() - 10 + " : LEFT THREAD IS REALEASED");
 			try {
-				//				max_taking 3
-				System.out.println(Thread.currentThread().getId()-10+" .... sleeping bei max_taking 3");
+
+				System.out.println(Thread.currentThread().getId() - 10 + " : MAX_TAKING_TIME_MS");
 				Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_TAKING_TIME_MS));
+
 			} catch (final InterruptedException e) {
-				System.out.println("Exception");
 				e.printStackTrace();
 			}
 
 		}
-		
-//		if(this.left.denktBoolean){
-//			if(this.right.denktBoolean){
-//				try {
-//					System.out.println("LAST TIME SLEEPING");
-//					isst.await();
-//				} catch (InterruptedException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//		System.out.println("LAST STEPP FPR SIGNAL ALL");
-//		isst.signal();
-		
-		if(this.isstBoolean == true){
-			System.out.println(Thread.currentThread().getId()-10+" ....using isst.signalAll()");
+
+		// if the variable for eating is true, the Thread will get wake up all
+		// other Threads.
+		if (this.isstBoolean == true) {
+
+			System.out.println(Thread.currentThread().getId() - 10 + " : WAKING ALL THREADS UP WITH SIGNALLALL()");
 			isst.signalAll();
 		}
-		
-		System.out.println(Thread.currentThread().getId()-10 + " stopped; eaten=" + this.eaten);
+
+		System.out.println(Thread.currentThread().getId() - 10 + " STOPPED; THREAD EATS=" + this.eaten);
 
 	}
 
@@ -193,13 +174,11 @@ public class Philosopher extends Thread {
 	}
 
 	public void setRight(Philosopher right) {
-		this.right =  right;
+		this.right = right;
 	}
-	public void setTable(Lock table){
+
+	public void setTable(Lock table) {
 		this.tablex = table;
 	}
-
-
-
 
 }
