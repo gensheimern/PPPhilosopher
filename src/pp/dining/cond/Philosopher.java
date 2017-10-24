@@ -46,7 +46,7 @@ public class Philosopher extends Thread {
 				Thread.sleep(this.random.nextInt(PhilosopherExperiment.MAX_THINKING_DURATION_MS));
 				System.out.println(Thread.currentThread().getId() - 10 + " : MAX_THINKIND_DURATION");
 			} catch (final InterruptedException e) {
-				// empty
+				e.printStackTrace();
 			} finally {
 				this.denktBoolean = false;
 			}
@@ -103,7 +103,6 @@ public class Philosopher extends Thread {
 				e.printStackTrace();
 			}
 
-			//
 			System.out.println(Thread.currentThread().getId() - 10 + " : GETTING LOCK, PREPARES TO EAT");
 			tablex.lock();
 
